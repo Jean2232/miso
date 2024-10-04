@@ -368,6 +368,8 @@ try {
 
 					case 'play':
 						if (!q) return reply(`> Você precisa digitar o nome de alguma música [!#]`)
+
+						reply(`> processando...`)
 						const yts = require("yt-search")
 						const yts_r = await yts(q).videos[0]
 						const play_fetch = await ytdown(yts_r.url).data
