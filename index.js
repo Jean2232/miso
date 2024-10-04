@@ -19,6 +19,7 @@ try {
 	const cfonts = require('cfonts')
 	const { exec, spawn, execSync } = require("child_process")
 	const speed = require("performance-now");
+	const { ndown, tikdown, ytdown } = require("nayan-media-downloader")
 
 	const sleep = async (ms) => { return new Promise(resolve => setTimeout(resolve, ms)) }
 	const color = (text, color) => { return !color ? chalk.green(text) : chalk.keyword(color)(text) }
@@ -249,20 +250,16 @@ try {
 					}
 					return buffer
 				}
-				
 				const isAutoSticker = isGroup ? auto_sticker.includes(from) : false
-			
 				const isBot = info.key.fromMe ? true : false
-				
 				const isGroupAdmins = groupAdmins.includes(sender) || false
 				const isBotGroupAdmins = groupAdmins.includes(botNumber) || false
 				const isOwner = sender.includes(infoBot.numeroDono)
 				q = args.join(" ")
 
 				if (isAutoSticker && isGroup && isMedia) {
-					sleep(200)
+					sleep(2000)
 					async function auto_stkr() {
-					  // Certifique-se de que a pasta cache exista
 					  const cacheDir = './cache';
 					  if (!fs.existsSync(cacheDir)) {
 						fs.mkdirSync(cacheDir);
@@ -272,10 +269,10 @@ try {
 					  var autor = `\n@imisobot`
 					  if (isMedia && !info.message.videoMessage || isQuotedImage) {
 						var encmedia = isQuotedImage ? info.message.extendedTextMessage.contextInfo.quotedMessage.imageMessage : info.message.imageMessage;
-						rane = path.join(cacheDir, getRandom('.' + await getExtension(encmedia.mimetype))); // Salvar na pasta cache
+						rane = path.join(cacheDir, getRandom('.' + await getExtension(encmedia.mimetype)));
 						buffimg = await getFileBuffer(encmedia, 'image');
 						fs.writeFileSync(rane, buffimg);
-						rano = path.join(cacheDir, getRandom('.webp')); // Salvar na pasta cache
+						rano = path.join(cacheDir, getRandom('.webp'));
 						exec(`ffmpeg -i ${rane} -vcodec libwebp -filter:v fps=fps=15 -lossless 1 -loop 0 -preset default -an -vsync 0 -s 800:800 ${rano}`, (err) => {
 						  fs.unlinkSync(rane);
 						  var json = {
@@ -286,7 +283,7 @@ try {
 						  var jsonBuff = Buffer.from(JSON.stringify(json), "utf-8");
 						  var exif = Buffer.concat([exifAttr, jsonBuff]);
 						  exif.writeUIntLE(jsonBuff.length, 14, 4);
-						  let nomemeta = path.join(cacheDir, Math.floor(Math.random() * (99999 - 11111 + 1) + 11111) + ".temp.exif"); // Salvar na pasta cache
+						  let nomemeta = path.join(cacheDir, Math.floor(Math.random() * (99999 - 11111 + 1) + 11111) + ".temp.exif");
 						  fs.writeFileSync(nomemeta, exif);
 						  exec(`webpmux -set exif ${nomemeta} ${rano} -o ${rano}`, () => {
 							client.sendMessage(from, { sticker: fs.readFileSync(rano) }, { quoted: info });
@@ -296,10 +293,10 @@ try {
 						});
 					  } else if (isMedia && info.message.videoMessage.seconds < 11 || isQuotedVideo && info.message.extendedTextMessage.contextInfo.quotedMessage.videoMessage.seconds < 35) {
 						var encmedia = isQuotedVideo ? info.message.extendedTextMessage.contextInfo.quotedMessage.videoMessage : info.message.videoMessage;
-						rane = path.join(cacheDir, getRandom('.' + await getExtension(encmedia.mimetype))); // Salvar na pasta cache
+						rane = path.join(cacheDir, getRandom('.' + await getExtension(encmedia.mimetype)));
 						buffimg = await getFileBuffer(encmedia, 'video');
 						fs.writeFileSync(rane, buffimg);
-						rano = path.join(cacheDir, getRandom('.webp')); // Salvar na pasta cache
+						rano = path.join(cacheDir, getRandom('.webp'));
 						await ffmpeg(`./${rane}`).inputFormat(rane.split('.')[1]);
 						exec(`ffmpeg -i ${rane} -vcodec libwebp -filter:v fps=fps=15 -lossless 1 -loop 0 -preset default -an -vsync 0 -s 200:200 ${rano}`, (err) => {
 						  fs.unlinkSync(rane);
@@ -311,7 +308,7 @@ try {
 						  let jsonBuff = Buffer.from(JSON.stringify(json), "utf-8");
 						  let exif = Buffer.concat([exifAttr, jsonBuff]);
 						  exif.writeUIntLE(jsonBuff.length, 14, 4);
-						  let nomemeta = path.join(cacheDir, "temp.exif"); // Salvar na pasta cache
+						  let nomemeta = path.join(cacheDir, "temp.exif");
 						  fs.writeFileSync(nomemeta, exif);
 						  exec(`webpmux -set exif ${nomemeta} ${rano} -o ${rano}`, () => {
 							client.sendMessage(from, { sticker: fs.readFileSync(rano) }, { quoted: info });
@@ -369,8 +366,36 @@ try {
 
 				switch (command) {
 
+					case 'play':
+						if (!q) return reply(`> Você precisa digitar o nome de alguma música [!#]`)
+						const yts = require("yt-search")
+						const yts_r = await yts(q).videos[0]
+						const play_fetch = await ytdown(yts_r.url).data
+
+
+						await client.relayMessage(from, {
+							extendedTextMessage: {
+								text: infoText,
+								contextInfo: {
+									externalAdReply: {
+										title: "miso",
+										body: "",
+										mediaType: 1,
+										previewType: 0,
+										renderLargerThumbnail: true,
+										thumbnailUrl: yts_r.thumbnail,
+										sourceUrl: url
+									}}, quoted: live }, }, {});
+
+						await client.sendMessage(from, {
+							audio: play_fetch.audio,
+							mimetype: 'audio/mpeg'
+						}, {
+							quoted: live
+						});
+					break
+
 					case 'autosticker':
-					case 'autofig':
 						if (!isGroup) return
 						if (!isGroupAdmins) return
 						if (!isBotGroupAdmins) return
