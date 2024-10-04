@@ -371,7 +371,7 @@ try {
 
 						reply(`> processando...`)
 						const yts = require("yt-search")
-						const yts_r = await yts(q).videos[0]
+						const yts_r = await yts(q).videos
 						const play_fetch = await ytdown(yts_r.url).data
 
 
