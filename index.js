@@ -20,17 +20,11 @@ try {
 	const { exec, spawn, execSync } = require("child_process")
 	const speed = require("performance-now");
 
-	
 	const sleep = async (ms) => { return new Promise(resolve => setTimeout(resolve, ms)) }
-	const color = (text, color) => {
-		return !color ? chalk.green(text) : chalk.keyword(color)(text)
-	}
+	const color = (text, color) => { return !color ? chalk.green(text) : chalk.keyword(color)(text) }
 	
 	const auto_sticker = JSON.parse(fs.readFileSync('./data/functions/autosticker.json'))
-	// C:\Users\Jean\Documents\miso - Copia\data\functions\autosticker.json
 	const infoBot = JSON.parse(fs.readFileSync('./config.json'));
-
-
 
 	var prefix = infoBot.prefix
 	var nomeBot = infoBot.nomeBot
@@ -266,6 +260,7 @@ try {
 				q = args.join(" ")
 
 				if (isAutoSticker && isGroup && isMedia) {
+					sleep(200)
 					async function auto_stkr() {
 					  // Certifique-se de que a pasta cache exista
 					  const cacheDir = './cache';
@@ -274,6 +269,7 @@ try {
 					  }
 				  
 					  var legenda = `Criado pela Misö\nPor ${pushname}\ndarkenemies.com.br`
+					  var autor = `\n@imisobot`
 					  if (isMedia && !info.message.videoMessage || isQuotedImage) {
 						var encmedia = isQuotedImage ? info.message.extendedTextMessage.contextInfo.quotedMessage.imageMessage : info.message.imageMessage;
 						rane = path.join(cacheDir, getRandom('.' + await getExtension(encmedia.mimetype))); // Salvar na pasta cache
@@ -284,7 +280,7 @@ try {
 						  fs.unlinkSync(rane);
 						  var json = {
 							"sticker-pack-name": legenda,
-							"sticker-pack-publisher": null
+							"sticker-pack-publisher": autor
 						  };
 						  var exifAttr = Buffer.from([0x49, 0x49, 0x2A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x41, 0x57, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00]);
 						  var jsonBuff = Buffer.from(JSON.stringify(json), "utf-8");
@@ -309,7 +305,7 @@ try {
 						  fs.unlinkSync(rane);
 						  let json = {
 							"sticker-pack-name": legenda,
-							"sticker-pack-publisher": null
+							"sticker-pack-publisher": autor
 						  };
 						  let exifAttr = Buffer.from([0x49, 0x49, 0x2A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x41, 0x57, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00]);
 						  let jsonBuff = Buffer.from(JSON.stringify(json), "utf-8");
@@ -370,10 +366,9 @@ try {
 						color(`\nNome: ${pushname}`, 'red'))
 					}
 				  }
-				
-		  
 
 				switch (command) {
+
 					case 'autosticker':
 					case 'autofig':
 						if (!isGroup) return
