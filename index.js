@@ -257,8 +257,10 @@ try {
 				const isOwner = sender.includes(infoBot.numeroDono)
 				q = args.join(" ")
 
+				if (!isGroup) { return null }
+
 				if (isAutoSticker && isGroup && isMedia) {
-					sleep(2000)
+					sleep(4000)
 					async function auto_stkr() {
 					  const cacheDir = './cache';
 					  if (!fs.existsSync(cacheDir)) {
@@ -266,7 +268,7 @@ try {
 					  }
 				  
 					  var legenda = `Criado pela Misö\nPor ${pushname}\ndarkenemies.com.br`
-					  var autor = `\n@imisobot`
+					  var autor = `X: @amisobot\nInsta: @imisobot\nlinktr.ee/amisobot`
 					  if (isMedia && !info.message.videoMessage || isQuotedImage) {
 						var encmedia = isQuotedImage ? info.message.extendedTextMessage.contextInfo.quotedMessage.imageMessage : info.message.imageMessage;
 						rane = path.join(cacheDir, getRandom('.' + await getExtension(encmedia.mimetype)));
@@ -366,41 +368,10 @@ try {
 
 				switch (command) {
 
-					case 'play':
-						if (!q) return reply(`> Você precisa digitar o nome de alguma música [!#]`)
-
-						reply(`> processando...`)
-						const yts = require("yt-search")
-						const yts_r = await yts(q).videos
-						const play_fetch = await ytdown(yts_r.url).data
-
-
-						await client.relayMessage(from, {
-							extendedTextMessage: {
-								text: infoText,
-								contextInfo: {
-									externalAdReply: {
-										title: "miso",
-										body: "",
-										mediaType: 1,
-										previewType: 0,
-										renderLargerThumbnail: true,
-										thumbnailUrl: yts_r.thumbnail,
-										sourceUrl: url
-									}}, quoted: live }, }, {});
-
-						await client.sendMessage(from, {
-							audio: play_fetch.audio,
-							mimetype: 'audio/mpeg'
-						}, {
-							quoted: live
-						});
-					break
-
 					case 'autosticker':
-						if (!isGroup) return
-						if (!isGroupAdmins) return
-						if (!isBotGroupAdmins) return
+						if (!isGroup) return;
+						if (!isGroupAdmins) return;
+						if (!isBotGroupAdmins) return;
 						if (Number(args[0]) === 1) {
 						  if (isAutoSticker) return reply('> o recurso se encontra ativo.');
 						  auto_sticker.push(from);
@@ -417,6 +388,16 @@ try {
 						  fs.writeFileSync('./data/functions/autosticker.json', JSON.stringify(auto_sticker));
 						  reply('> Recurso de autosticker desativado!');
 						}
+						break;
+
+						case 's', 'f', 'fig', 'sticker':
+							auto_stkr().catch(e => {
+								console.log(e);
+								reply("> Erro[!#]")});
+						break;
+
+						case _:
+							reply(`> Comando não encontrado [!#]`);
 						break;
 			
 				
