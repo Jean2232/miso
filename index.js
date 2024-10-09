@@ -396,7 +396,8 @@ try {
 								reply("> Erro[!#]")});
 						break;
 
-						case _:
+						default:
+							if (!iscmd) { return }
 							reply(`> Comando não encontrado [!#]`);
 						break;
 			
