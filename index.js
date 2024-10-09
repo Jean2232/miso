@@ -396,15 +396,6 @@ try {
 								reply("> Erro[!#]")});
 						break;
 
-						default:
-							if (!iscmd) { return }
-							reply(`> Comando não encontrado [!#]`);
-						break;
-			
-				
-
-						
-					
 				}} catch (e) {
 				console.log(e)
 			}
