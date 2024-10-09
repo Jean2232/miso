@@ -390,7 +390,10 @@ try {
 						}
 						break;
 
-						case 's', 'f', 'fig', 'sticker':
+						case 's':
+						case 'f':
+						case 'fig':
+						case 'sticker':
 							auto_stkr().catch(e => {
 								console.log(e);
 								reply("> Erro[!#]")});
