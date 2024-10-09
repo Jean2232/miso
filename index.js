@@ -257,72 +257,72 @@ try {
 				const isOwner = sender.includes(infoBot.numeroDono)
 				q = args.join(" ")
 
+				async function auto_stkr() {
+					const cacheDir = './cache';
+					if (!fs.existsSync(cacheDir)) {
+					  fs.mkdirSync(cacheDir);
+					}
+				
+					var legenda = `Criado pela Misö\nPor ${pushname}\ndarkenemies.com.br`
+					var autor = `X: @amisobot\nInsta: @imisobot\nlinktr.ee/amisobot`
+					if (isMedia && !info.message.videoMessage || isQuotedImage) {
+					  var encmedia = isQuotedImage ? info.message.extendedTextMessage.contextInfo.quotedMessage.imageMessage : info.message.imageMessage;
+					  rane = path.join(cacheDir, getRandom('.' + await getExtension(encmedia.mimetype)));
+					  buffimg = await getFileBuffer(encmedia, 'image');
+					  fs.writeFileSync(rane, buffimg);
+					  rano = path.join(cacheDir, getRandom('.webp'));
+					  exec(`ffmpeg -i ${rane} -vcodec libwebp -filter:v fps=fps=15 -lossless 1 -loop 0 -preset default -an -vsync 0 -s 800:800 ${rano}`, (err) => {
+						fs.unlinkSync(rane);
+						var json = {
+						  "sticker-pack-name": legenda,
+						  "sticker-pack-publisher": autor
+						};
+						var exifAttr = Buffer.from([0x49, 0x49, 0x2A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x41, 0x57, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00]);
+						var jsonBuff = Buffer.from(JSON.stringify(json), "utf-8");
+						var exif = Buffer.concat([exifAttr, jsonBuff]);
+						exif.writeUIntLE(jsonBuff.length, 14, 4);
+						let nomemeta = path.join(cacheDir, Math.floor(Math.random() * (99999 - 11111 + 1) + 11111) + ".temp.exif");
+						fs.writeFileSync(nomemeta, exif);
+						exec(`webpmux -set exif ${nomemeta} ${rano} -o ${rano}`, () => {
+						  client.sendMessage(from, { sticker: fs.readFileSync(rano) }, { quoted: info });
+						  fs.unlinkSync(nomemeta);
+						  fs.unlinkSync(rano);
+						});
+					  });
+					} else if (isMedia && info.message.videoMessage.seconds < 11 || isQuotedVideo && info.message.extendedTextMessage.contextInfo.quotedMessage.videoMessage.seconds < 35) {
+					  var encmedia = isQuotedVideo ? info.message.extendedTextMessage.contextInfo.quotedMessage.videoMessage : info.message.videoMessage;
+					  rane = path.join(cacheDir, getRandom('.' + await getExtension(encmedia.mimetype)));
+					  buffimg = await getFileBuffer(encmedia, 'video');
+					  fs.writeFileSync(rane, buffimg);
+					  rano = path.join(cacheDir, getRandom('.webp'));
+					  await ffmpeg(`./${rane}`).inputFormat(rane.split('.')[1]);
+					  exec(`ffmpeg -i ${rane} -vcodec libwebp -filter:v fps=fps=15 -lossless 1 -loop 0 -preset default -an -vsync 0 -s 200:200 ${rano}`, (err) => {
+						fs.unlinkSync(rane);
+						let json = {
+						  "sticker-pack-name": legenda,
+						  "sticker-pack-publisher": autor
+						};
+						let exifAttr = Buffer.from([0x49, 0x49, 0x2A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x41, 0x57, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00]);
+						let jsonBuff = Buffer.from(JSON.stringify(json), "utf-8");
+						let exif = Buffer.concat([exifAttr, jsonBuff]);
+						exif.writeUIntLE(jsonBuff.length, 14, 4);
+						let nomemeta = path.join(cacheDir, "temp.exif");
+						fs.writeFileSync(nomemeta, exif);
+						exec(`webpmux -set exif ${nomemeta} ${rano} -o ${rano}`, () => {
+						  client.sendMessage(from, { sticker: fs.readFileSync(rano) }, { quoted: info });
+						  fs.unlinkSync(nomemeta);
+						  fs.unlinkSync(rano);
+						});
+					  });
+					} else {
+					  reply(`Você precisa enviar ou marcar uma imagem ou vídeo com no máximo 10 segundos`);
+					}
+				  }
+
 				if (!isGroup) { return null }
 
 				if (isAutoSticker && isGroup && isMedia) {
 					sleep(4000)
-					async function auto_stkr() {
-					  const cacheDir = './cache';
-					  if (!fs.existsSync(cacheDir)) {
-						fs.mkdirSync(cacheDir);
-					  }
-				  
-					  var legenda = `Criado pela Misö\nPor ${pushname}\ndarkenemies.com.br`
-					  var autor = `X: @amisobot\nInsta: @imisobot\nlinktr.ee/amisobot`
-					  if (isMedia && !info.message.videoMessage || isQuotedImage) {
-						var encmedia = isQuotedImage ? info.message.extendedTextMessage.contextInfo.quotedMessage.imageMessage : info.message.imageMessage;
-						rane = path.join(cacheDir, getRandom('.' + await getExtension(encmedia.mimetype)));
-						buffimg = await getFileBuffer(encmedia, 'image');
-						fs.writeFileSync(rane, buffimg);
-						rano = path.join(cacheDir, getRandom('.webp'));
-						exec(`ffmpeg -i ${rane} -vcodec libwebp -filter:v fps=fps=15 -lossless 1 -loop 0 -preset default -an -vsync 0 -s 800:800 ${rano}`, (err) => {
-						  fs.unlinkSync(rane);
-						  var json = {
-							"sticker-pack-name": legenda,
-							"sticker-pack-publisher": autor
-						  };
-						  var exifAttr = Buffer.from([0x49, 0x49, 0x2A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x41, 0x57, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00]);
-						  var jsonBuff = Buffer.from(JSON.stringify(json), "utf-8");
-						  var exif = Buffer.concat([exifAttr, jsonBuff]);
-						  exif.writeUIntLE(jsonBuff.length, 14, 4);
-						  let nomemeta = path.join(cacheDir, Math.floor(Math.random() * (99999 - 11111 + 1) + 11111) + ".temp.exif");
-						  fs.writeFileSync(nomemeta, exif);
-						  exec(`webpmux -set exif ${nomemeta} ${rano} -o ${rano}`, () => {
-							client.sendMessage(from, { sticker: fs.readFileSync(rano) }, { quoted: info });
-							fs.unlinkSync(nomemeta);
-							fs.unlinkSync(rano);
-						  });
-						});
-					  } else if (isMedia && info.message.videoMessage.seconds < 11 || isQuotedVideo && info.message.extendedTextMessage.contextInfo.quotedMessage.videoMessage.seconds < 35) {
-						var encmedia = isQuotedVideo ? info.message.extendedTextMessage.contextInfo.quotedMessage.videoMessage : info.message.videoMessage;
-						rane = path.join(cacheDir, getRandom('.' + await getExtension(encmedia.mimetype)));
-						buffimg = await getFileBuffer(encmedia, 'video');
-						fs.writeFileSync(rane, buffimg);
-						rano = path.join(cacheDir, getRandom('.webp'));
-						await ffmpeg(`./${rane}`).inputFormat(rane.split('.')[1]);
-						exec(`ffmpeg -i ${rane} -vcodec libwebp -filter:v fps=fps=15 -lossless 1 -loop 0 -preset default -an -vsync 0 -s 200:200 ${rano}`, (err) => {
-						  fs.unlinkSync(rane);
-						  let json = {
-							"sticker-pack-name": legenda,
-							"sticker-pack-publisher": autor
-						  };
-						  let exifAttr = Buffer.from([0x49, 0x49, 0x2A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x00, 0x41, 0x57, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00]);
-						  let jsonBuff = Buffer.from(JSON.stringify(json), "utf-8");
-						  let exif = Buffer.concat([exifAttr, jsonBuff]);
-						  exif.writeUIntLE(jsonBuff.length, 14, 4);
-						  let nomemeta = path.join(cacheDir, "temp.exif");
-						  fs.writeFileSync(nomemeta, exif);
-						  exec(`webpmux -set exif ${nomemeta} ${rano} -o ${rano}`, () => {
-							client.sendMessage(from, { sticker: fs.readFileSync(rano) }, { quoted: info });
-							fs.unlinkSync(nomemeta);
-							fs.unlinkSync(rano);
-						  });
-						});
-					  } else {
-						reply(`Você precisa enviar ou marcar uma imagem ou vídeo com no máximo 10 segundos`);
-					  }
-					}
-				  
 					auto_stkr().catch(e => {
 					  console.log(e);
 					  reply("> Erro[!#]");
