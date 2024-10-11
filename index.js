@@ -466,7 +466,7 @@ try {
 						break
 
 						default:
-							if(startsWith(prefix)){ return reply(`> comando não encontrado [!#]`) }
+							if( isCmd ){ return reply(`> comando não encontrado [!#]`) }
 						break
 
 				}} catch (e) {
