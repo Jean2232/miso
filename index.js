@@ -401,6 +401,8 @@ try {
 						break;
 
 						case 'play':
+						case 'tocar':
+						case 'musica':
 							if (!q) return reply(`> digite o nome de uma música!`)
 								reply(`> processando...`)								
 								var search = require('yt-search');
@@ -416,9 +418,7 @@ try {
 								var description = results.videos[0].description;
 								var seconds = duration % 60;
 								var durationText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-								var audio = ytdl(videoId, {
-									quality: 'highestaudio'
-								});
+								var audio = ytdl(videoId, { quality: 'highestaudio' });
 								var inputFilePath = './tmp/' + title + '.webm';
 								var outputFilePath = './tmp/' + title + '.mp3';
 								var infoText = `◦ *Titulo*: ${title}\n◦ *Duração*: ${durationText}\n◦ *Upload*: ${uploadDate}\n◦ *ID*: ${videoId}\n◦ *Descrição*: ${description}\n◦ *URL*: ${url}
@@ -463,6 +463,10 @@ try {
 										})
 										.save(outputFilePath);
 								});
+						break
+
+						default:
+							reply(`> comando não encontrado [!#]`)
 						break
 
 				}} catch (e) {
