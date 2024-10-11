@@ -450,7 +450,7 @@ try {
 												audio: buffer,
 												mimetype: 'audio/mpeg'
 											}, {
-												quoted: live
+												quoted: info
 											});
 											fs.unlinkSync(inputFilePath);
 											fs.unlinkSync(outputFilePath);
