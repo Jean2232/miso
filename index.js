@@ -437,7 +437,7 @@ try {
 												sourceUrl: url
 											}
 										},
-										quoted: live
+										quoted: info
 									},
 								}, {});
 		
