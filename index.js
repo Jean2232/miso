@@ -16,10 +16,11 @@ try {
 	const readline = require("readline");
 	const axios = require('axios');
 	const ffmpeg = require('fluent-ffmpeg');
-	const cfonts = require('cfonts')
-	const { exec, spawn, execSync } = require("child_process")
+	const ytdl = require("@distube/ytdl-core");
+	const cfonts = require('cfonts');
+	const { exec, spawn, execSync } = require("child_process");
 	const speed = require("performance-now");
-	const { ndown, tikdown, ytdown } = require("nayan-media-downloader")
+	const { ndown, tikdown, ytdown } = require("nayan-media-downloader");
 
 	const sleep = async (ms) => { return new Promise(resolve => setTimeout(resolve, ms)) }
 	const color = (text, color) => { return !color ? chalk.green(text) : chalk.keyword(color)(text) }
@@ -398,6 +399,71 @@ try {
 								console.log(e);
 								reply("> Erro[!#]")});
 						break;
+
+						case 'play':
+							if (!q) return reply(`> digite o nome de uma música!`)
+								reply(`> processando...`)								
+								var search = require('yt-search');
+								var results = await search(q);
+								var videoId = results.videos[0].videoId;
+								var infovid = await ytdl.getInfo(videoId);
+								var title = infovid.videoDetails.title.replace(/[^\w\s]/gi, '');
+								var thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+								var url = infovid.videoDetails.video_url;
+								var duration = parseInt(infovid.videoDetails.lengthSeconds);
+								var uploadDate = new Date(infovid.videoDetails.publishDate).toLocaleDateString();
+								var minutes = Math.floor(duration / 60);
+								var description = results.videos[0].description;
+								var seconds = duration % 60;
+								var durationText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+								var audio = ytdl(videoId, {
+									quality: 'highestaudio'
+								});
+								var inputFilePath = './tmp/' + title + '.webm';
+								var outputFilePath = './tmp/' + title + '.mp3';
+								var infoText = `◦ *Titulo*: ${title}\n◦ *Duração*: ${durationText}\n◦ *Upload*: ${uploadDate}\n◦ *ID*: ${videoId}\n◦ *Descrição*: ${description}\n◦ *URL*: ${url}
+				  `;
+								client.relayMessage(from, {
+									extendedTextMessage: {
+										text: infoText,
+										contextInfo: {
+											externalAdReply: {
+												title: "miso",
+												body: "",
+												mediaType: 1,
+												previewType: 0,
+												renderLargerThumbnail: true,
+												thumbnailUrl: thumbnailUrl,
+												sourceUrl: url
+											}
+										},
+										quoted: live
+									},
+								}, {});
+		
+								audio.pipe(fs.createWriteStream(inputFilePath)).on('finish', async () => {
+									ffmpeg(inputFilePath)
+										.toFormat('mp3')
+										.on('end', async () => {
+											let buffer = fs.readFileSync(outputFilePath);
+											client.sendMessage(from, {
+												audio: buffer,
+												mimetype: 'audio/mpeg'
+											}, {
+												quoted: live
+											});
+											fs.unlinkSync(inputFilePath);
+											fs.unlinkSync(outputFilePath);
+										})
+										.on('error', (err) => {
+											console.log(err);
+											reply(`Erro ao converter o audio`);
+											fs.unlinkSync(inputFilePath);
+											fs.unlinkSync(outputFilePath);
+										})
+										.save(outputFilePath);
+								});
+						break
 
 				}} catch (e) {
 				console.log(e)
