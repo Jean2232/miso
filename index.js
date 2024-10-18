@@ -18,7 +18,7 @@ try {
 	const ffmpeg = require('fluent-ffmpeg');
 	const ytdl = require("@distube/ytdl-core");
 	const cfonts = require('cfonts');
-	const { exec, spawn, execSync } = require("child_process");
+	const { exec } = require("child_process");
 	const speed = require("performance-now");
 	const { ndown, tikdown, ytdown } = require("nayan-media-downloader");
 
@@ -28,13 +28,13 @@ try {
 	const auto_sticker = JSON.parse(fs.readFileSync('./data/functions/autosticker.json'))
 	const infoBot = JSON.parse(fs.readFileSync('./config.json'));
 
-	var prefix = infoBot.prefix
-	var nomeBot = infoBot.nomeBot
-	var NomeBot = infoBot.nomeBot
-	var nomeDono = infoBot.nomeDono
-	var SoDono = infoBot.numeroDono
-	var link = infoBot.link
-	var numeroDono = infoBot.numeroDono
+	const prefix = infoBot.prefix
+	const nomeBot = infoBot.nomeBot
+	const NomeBot = infoBot.nomeBot
+	const nomeDono = infoBot.nomeDono
+	const SoDono = infoBot.numeroDono
+	const link = infoBot.link
+	const numeroDono = infoBot.numeroDono
 
 
 	const useStore = !process.argv.includes('--no-store')
@@ -464,6 +464,108 @@ try {
 										.save(outputFilePath);
 								});
 						break
+
+						
+					case 'ban':
+						case 'kick':
+							if (!isGroup) return
+							if (!isGroupAdmins) return reply(`Este comando só pode ser utilizado por admins! [##!]`)
+							if (!isBotGroupAdmins) return
+	
+							if (info.message.extendedTextMessage === undefined || info.message.extendedTextMessage === null) return reply('> ninguem foi marcado [##!]')
+							if (info.message.extendedTextMessage.contextInfo.participant !== null && info.message.extendedTextMessage.contextInfo.participant != undefined && info.message.extendedTextMessage.contextInfo.participant !== "") {
+								mentioned = info.message.extendedTextMessage.contextInfo.mentionedJid[0] ? info.message.extendedTextMessage.contextInfo.mentionedJid[0] : info.message.extendedTextMessage.contextInfo.participant
+								if (sender.includes(mentioned)) return reply("> análise")
+								if (botNumber.includes(mentioned)) return reply('> análise')
+								let responseb = await client.groupParticipantsUpdate(from, [mentioned], 'remove')
+								if (responseb[0].status === "200") client.sendMessage(from, {
+									text: `@${mentioned.split("@")[0]} removido`,
+									mentions: [mentioned, sender],
+									contextInfo: {
+										forwardingScore: 999,
+										isForwarded: true
+									}
+								})
+								else if (responseb[0].status === "406") client.sendMessage(from, {
+									text: `@${mentioned.split("@")[0]} criou esse grupo e não pode ser removido(a) do grupo️`,
+									mentions: [mentioned, sender],
+									contextInfo: {
+										forwardingScore: 999,
+										isForwarded: true
+									}
+								})
+								else if (responseb[0].status === "404") client.sendMessage(from, {
+									text: `@${mentioned.split("@")[0]} já foi removido(a) ou saiu do grupo`,
+									mentions: [mentioned, sender],
+									contextInfo: {
+										forwardingScore: 999,
+										isForwarded: true
+									}
+								})
+								else client.ontextInfoe(from, {
+									text: `Hmm parece que deu erro️`,
+									mentions: [sender],
+									contextInfo: {
+										forwardingScore: 999,
+										isForwarded: true
+									}
+								})
+							} else if (info.message.extendedTextMessage.contextInfo.mentionedJid != null && info.message.extendedTextMessage.contextInfo.mentionedJid != undefined) {
+								mentioned = info.message.extendedTextMessage.contextInfo.mentionedJid
+								if (mentioned.includes(sender)) return reply("> análise")
+								if (mentioned.length > 1) {
+									if (mentioned.length > groupMembers.length || mentioned.length === groupMembers.length || mentioned.length > groupMembers.length - 3) return reply(`Vai banir todo mundo mesmo?`)
+									sexocomrato = 0
+									for (let banned of mentioned) {
+										await sleep(100)
+										let responseb2 = await client.groupParticipantsUpdate(from, [banned], 'remove')
+										if (responseb2[0].status === "200") sexocomrato = sexocomrato + 1
+									}
+									client.sendMessage(from, {
+										text: `${sexocomrato} participantes removido do grupo`,
+										mentions: [sender],
+										contextInfo: {
+											forwardingScore: 999,
+											isForwarded: true
+										}
+									})
+								} else {
+									let responseb3 = await client.groupParticipantsUpdate(from, [mentioned[0]], 'remove')
+									if (responseb3[0].status === "200") client.sendMessage(from, {
+										text: `@${mentioned[0].split("@")[0]} foi de arrasta`,
+										mentions: [mentioned[0], sender],
+										contextInfo: {
+											forwardingScore: 999,
+											isForwarded: true
+										}
+									})
+									else if (responseb3[0].status === "406") client.sendMessage(from, {
+										text: `@${mentioned[0].split("@")[0]} criou esse grupo e não pode ser removido(a) do grupo️`,
+										mentions: [mentioned[0], sender],
+										contextInfo: {
+											forwardingScore: 999,
+											isForwarded: true
+										}
+									})
+									else if (responseb3[0].status === "404") client.sendMessage(from, {
+										text: `@${mentioned[0].split("@")[0]} já foi removido(a) ou saiu do grupo`,
+										mentions: [mentioned[0], sender],
+										contextInfo: {
+											forwardingScore: 999,
+											isForwarded: true
+										}
+									})
+									else client.sendMessage(from, {
+										text: `Hmm parece que deu erro️`,
+										mentions: [sender],
+										contextInfo: {
+											forwardingScore: 999,
+											isForwarded: true
+										}
+									})
+								}
+							}
+							break
 
 						default:
 							if( isCmd ){ return reply(`> comando não encontrado [!#]`) }
